@@ -8,37 +8,38 @@ public class SmarterAI implements IOthelloAI {
     private final int CUTOFF = 5;
 
 	public Position decideMove(GameState s) {   // MiniMax search
-        return maxValue(0, s).getMove();
+        Position newMove = maxValue(0, s, new Position(-1, -1)).getMove();
+        return newMove;
 	}
     
-    private UtilityMove eval(GameState s) {
+    private UtilityMove eval(GameState s, Position p) {
         int acquiredTokens = s.getPlayerInTurn() == 1 ? s.countTokens()[0] : -s.countTokens()[1];
-        return new UtilityMove(acquiredTokens, null);
+        return new UtilityMove(acquiredTokens, p);
 	}
 
-    private UtilityMove maxValue(int depth, GameState s) {
-        if (isCutoff(depth,s)) return eval(s);
+    private UtilityMove maxValue(int depth, GameState s, Position p) {
+        if (isCutoff(depth,s)) return eval(s, p);
         
-        UtilityMove bestMove = new UtilityMove(Integer.MIN_VALUE, null);
-        for (Position p : s.legalMoves()) {
-            System.out.println("maxpositions is null: " + (p == null));
-            UtilityMove currentMove = minValue(depth+1, futureState(p, s));
-            if(currentMove.utility > bestMove.utility){
-                bestMove = currentMove;
+        UtilityMove bestMove = new UtilityMove(Integer.MIN_VALUE, new Position(-1, -1));
+        for (Position p2 : s.legalMoves()) {
+            UtilityMove currentMove = minValue(depth+1, futureState(p2, s), p2);
+            if(currentMove.getUtility() > bestMove.getUtility()){
+                bestMove.setUtility(currentMove.getUtility());
+                bestMove.setMove(p2);
             }
         }
         return bestMove;
     }
 
-    private UtilityMove minValue(int depth, GameState s) {
-        if (isCutoff(depth,s)) return eval(s);
+    private UtilityMove minValue(int depth, GameState s, Position p) {
+        if (isCutoff(depth,s)) return eval(s, p);
         
-        UtilityMove bestMove = new UtilityMove(Integer.MAX_VALUE, null);
-        for (Position p : s.legalMoves()) {
-            System.out.println("minposition is null: " + (p == null));
-            UtilityMove currentMove = maxValue(depth+1, futureState(p, s));
-            if(currentMove.utility < bestMove.utility){
-                bestMove = currentMove;
+        UtilityMove bestMove = new UtilityMove(Integer.MAX_VALUE, new Position(-1, -1));
+        for (Position p2 : s.legalMoves()) {
+            UtilityMove currentMove = maxValue(depth+1, futureState(p2, s), p2);
+            if(currentMove.getUtility() < bestMove.getUtility()){
+                bestMove.setUtility(currentMove.getUtility());
+                bestMove.setMove(p2);
             }
         }
         return bestMove;
@@ -69,6 +70,14 @@ class UtilityMove {
     }
 
     public Position getMove(){
-        return move;
+        return this.move;
+    }
+
+    public void setMove(Position move){
+        this.move = move;
+    }
+
+    public void setUtility(int utility){
+        this.utility = utility;
     }
 }
