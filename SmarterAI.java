@@ -9,6 +9,13 @@ public class SmarterAI implements IOthelloAI {
 
 	public Position decideMove(GameState s) {   // MiniMax search
         Position newMove = maxValue(0, s, new Position(-1, -1)).getMove();
+        // TODO: this is not a good solution
+        // This occources when the algorithm can't find any legal moves. 
+        // Though, it should still be able find a move either horizontal, vertical or diagonally
+        if((newMove.col == -1 || newMove.row == -1) && s.legalMoves().size() != 0){
+            System.out.println("The Laurits fix🔥");
+            return s.legalMoves().get(0);
+        }
         return newMove;
 	}
     
