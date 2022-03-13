@@ -25,7 +25,7 @@ public class SmarterAI implements IOthelloAI {
         return newMove;
 	}
     
-    private UtilityMove eval(GameState s, Position p) {
+    private UtilityMove eval(GameState s, Position p, int depth) {
         int[][] board = s.getBoard();
         int utility = 0;
         int size = board.length - 1;
@@ -46,12 +46,13 @@ public class SmarterAI implements IOthelloAI {
                 }
             }
         }
+        if (depth%2 == 1) utility = utility * -1; // Check if we are at a min node
         return new UtilityMove(utility, p);
 	}
 
     // Find MAX value for the MiniMax algorithm using a beta-cutoff
     private UtilityMove maxValue(int depth, GameState s, Position p, int alpha, int beta) {
-        if (isCutoff(depth,s)) return eval(s, p);
+        if (isCutoff(depth,s)) return eval(s, p, depth);
         
         UtilityMove bestMove = new UtilityMove(Integer.MIN_VALUE, new Position(-1, -1));
         for (Position p2 : s.legalMoves()) {
@@ -68,7 +69,7 @@ public class SmarterAI implements IOthelloAI {
 
     // Find MIN value for the Minimax algorithm using a alpha-cutoff
     private UtilityMove minValue(int depth, GameState s, Position p, int alpha, int beta) {
-        if (isCutoff(depth,s)) return eval(s, p);
+        if (isCutoff(depth,s)) return eval(s, p, depth);
         
         UtilityMove bestMove = new UtilityMove(Integer.MAX_VALUE, new Position(-1, -1));
         for (Position p2 : s.legalMoves()) {
@@ -85,7 +86,11 @@ public class SmarterAI implements IOthelloAI {
 
     // Returns if we have reached a terminalstate, our cutoff constant or we do not have any legal moves left.
 	private boolean isCutoff(int depth, GameState s) {
-        return s.isFinished() || depth > CUTOFF || s.legalMoves().size() == 0;
+        if(s.isFinished()){
+            //System.out.println("Black count: " + s.countTokens()[0] + "\tWhite count: " + s.countTokens()[1]);
+            return true;
+        }
+        return depth > CUTOFF || s.legalMoves().size() == 0;
 	}
 
     // Setup of new GameState used for recursive call for each branch
