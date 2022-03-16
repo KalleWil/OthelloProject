@@ -1,9 +1,9 @@
 import java.util.Date;
 
 /**
- * 
+ * Group 8's Othello AI
  */
-public class SmarterAI implements IOthelloAI {
+public class OthelloAI8 implements IOthelloAI {
 
     private final int CUTOFF = 7;
     private long startTime;
@@ -87,7 +87,6 @@ public class SmarterAI implements IOthelloAI {
     // Returns if we have reached a terminalstate, our cutoff constant or we do not have any legal moves left.
 	private boolean isCutoff(int depth, GameState s) {
         if(s.isFinished()){
-            //System.out.println("Black count: " + s.countTokens()[0] + "\tWhite count: " + s.countTokens()[1]);
             return true;
         }
         return depth > CUTOFF || s.legalMoves().size() == 0;
